@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public class AddItemToCartJpaAdapter implements AddItemToCartPersistencePort {
+public class ShoppingCartJpaAdapter implements AddItemToCartPersistencePort {
 
     private final ShoppingCartRepository shoppingCartRepository;
     private final ShoppingCartEntityMapper shoppingCartEntityMapper;
     private final CartItemEntityMapper cartItemMapper;
 
-    public AddItemToCartJpaAdapter(ShoppingCartRepository shoppingCartRepository, ShoppingCartEntityMapper shoppingCartEntityMapper, CartItemEntityMapper cartItemMapper) {
+    public ShoppingCartJpaAdapter(ShoppingCartRepository shoppingCartRepository, ShoppingCartEntityMapper shoppingCartEntityMapper, CartItemEntityMapper cartItemMapper) {
         this.shoppingCartRepository = shoppingCartRepository;
         this.shoppingCartEntityMapper = shoppingCartEntityMapper;
 

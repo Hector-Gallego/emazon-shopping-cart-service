@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddItemToCartUseCase implements AddItemToCartServicePort {
+public class ShoppingCartUseCase implements AddItemToCartServicePort {
 
     private final AddItemToCartPersistencePort addItemToCartPersistencePort;
     private final AuthenticatedManagerPort authenticatedManagerPort;
     private final StockValidator stockValidator;
 
-    public AddItemToCartUseCase(AddItemToCartPersistencePort addItemToCartPersistencePort,
-                                AuthenticatedManagerPort authenticatedManagerPort,
-                                StockValidator stockValidator) {
+    public ShoppingCartUseCase(AddItemToCartPersistencePort addItemToCartPersistencePort,
+                               AuthenticatedManagerPort authenticatedManagerPort,
+                               StockValidator stockValidator) {
 
         this.addItemToCartPersistencePort = addItemToCartPersistencePort;
         this.authenticatedManagerPort = authenticatedManagerPort;

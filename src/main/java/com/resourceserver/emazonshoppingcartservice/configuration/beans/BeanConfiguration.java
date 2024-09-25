@@ -5,11 +5,11 @@ import com.resourceserver.emazonshoppingcartservice.domain.ports.api.AddItemToCa
 import com.resourceserver.emazonshoppingcartservice.domain.ports.feign.StockFeignServicePort;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.sec.AuthenticatedManagerPort;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.spi.AddItemToCartPersistencePort;
-import com.resourceserver.emazonshoppingcartservice.domain.usecase.AddItemToCartUseCase;
+import com.resourceserver.emazonshoppingcartservice.domain.usecase.ShoppingCartUseCase;
 import com.resourceserver.emazonshoppingcartservice.domain.validators.StockValidator;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.feign.adapter.StockFeignClientAdapter;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.feign.interfaces.StockFeignClient;
-import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.adapter.AddItemToCartJpaAdapter;
+import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.adapter.ShoppingCartJpaAdapter;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.mapper.CartItemEntityMapper;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.mapper.ShoppingCartEntityMapper;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.repository.ShoppingCartRepository;
@@ -25,7 +25,7 @@ public class BeanConfiguration {
             AuthenticatedManagerPort authenticatedManagerPort,
             StockValidator stockValidator) {
 
-        return new AddItemToCartUseCase(
+        return new ShoppingCartUseCase(
                 addItemToCartPersistencePort,
                 authenticatedManagerPort,
                 stockValidator);
@@ -36,7 +36,7 @@ public class BeanConfiguration {
             ShoppingCartRepository shoppingCartRepository,
             ShoppingCartEntityMapper shoppingCartEntityMapper,
             CartItemEntityMapper cartItemEntityMapper) {
-        return new AddItemToCartJpaAdapter(shoppingCartRepository, shoppingCartEntityMapper, cartItemEntityMapper);
+        return new ShoppingCartJpaAdapter(shoppingCartRepository, shoppingCartEntityMapper, cartItemEntityMapper);
     }
 
     @Bean

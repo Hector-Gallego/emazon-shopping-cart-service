@@ -15,21 +15,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/cart")
-public class AddItemToCartController {
+public class ShoppingCartController {
 
 
     private final AddItemToCartServicePort addItemToCartServicePort;
     private final CartItemMapper cartItemMapper;
-    public AddItemToCartController(AddItemToCartServicePort addItemToCartServicePort, CartItemMapper cartItemMapper) {
+    public ShoppingCartController(AddItemToCartServicePort addItemToCartServicePort, CartItemMapper cartItemMapper) {
         this.addItemToCartServicePort = addItemToCartServicePort;
         this.cartItemMapper = cartItemMapper;
     }

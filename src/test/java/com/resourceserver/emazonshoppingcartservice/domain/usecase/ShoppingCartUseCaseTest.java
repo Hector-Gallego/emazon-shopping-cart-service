@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AddItemToCartUseCaseTest {
+class ShoppingCartUseCaseTest {
 
     @Mock
     private AuthenticatedManagerPort authenticatedManagerPort;
@@ -32,7 +32,7 @@ class AddItemToCartUseCaseTest {
     private AddItemToCartPersistencePort addItemToCartPersistencePort;
 
     @InjectMocks
-    private AddItemToCartUseCase addItemToCartUseCase;
+    private ShoppingCartUseCase shoppingCartUseCase;
 
     @Test
     void shouldAddItemToCartWhenCartExists() {
@@ -42,7 +42,7 @@ class AddItemToCartUseCaseTest {
         when(authenticatedManagerPort.getUserId()).thenReturn(userId);
         when(addItemToCartPersistencePort.doesCartExist(userId)).thenReturn(true);
 
-        addItemToCartUseCase.addItemToCartShopping(cartItem);
+        shoppingCartUseCase.addItemToCartShopping(cartItem);
 
         verify(stockValidator).validateStockAvailability(any(StockVerificationRequest.class));
         verify(addItemToCartPersistencePort).addItemToCart(cartItem, userId);
@@ -57,7 +57,7 @@ class AddItemToCartUseCaseTest {
         when(authenticatedManagerPort.getUserId()).thenReturn(userId);
         when(addItemToCartPersistencePort.doesCartExist(userId)).thenReturn(false);
 
-        addItemToCartUseCase.addItemToCartShopping(cartItem);
+        shoppingCartUseCase.addItemToCartShopping(cartItem);
 
         verify(stockValidator).validateStockAvailability(any(StockVerificationRequest.class));
         verify(addItemToCartPersistencePort, never()).addItemToCart(any(), eq(userId));
@@ -76,7 +76,7 @@ class AddItemToCartUseCaseTest {
 
         InsufficientStockException exception = assertThrows(
                 InsufficientStockException.class,
-                () -> addItemToCartUseCase.addItemToCartShopping(cartItem)
+                () -> shoppingCartUseCase.addItemToCartShopping(cartItem)
         );
         assertEquals(ErrorMessagesConstants.INSUFFICIENT_STOCK, exception.getMessage());
 
@@ -98,7 +98,7 @@ class AddItemToCartUseCaseTest {
 
         CategoryLimitExceededException exception = assertThrows(
                 CategoryLimitExceededException.class,
-                () -> addItemToCartUseCase.addItemToCartShopping(cartItem)
+                () -> shoppingCartUseCase.addItemToCartShopping(cartItem)
         );
         assertEquals(ErrorMessagesConstants.CATEGORY_LIMIT_EXCEEDED, exception.getMessage());
 
