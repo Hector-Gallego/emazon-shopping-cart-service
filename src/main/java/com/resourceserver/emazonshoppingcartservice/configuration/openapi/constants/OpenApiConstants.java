@@ -5,6 +5,7 @@ public final class OpenApiConstants {
 
 
 
+
     private OpenApiConstants(){
         throw new IllegalStateException();
     }
@@ -26,5 +27,8 @@ public final class OpenApiConstants {
 
     public static final String INVALID_INPUT = "Invalid input";
 
+    public static final String OPEN_API_REMOVE_ITEM_SHOPPING_CART_SUMMARY = "Remove item to the shopping cart";
+    public static final String OPEN_API_REMOVE_ITEM_SHOPPING_CART_DESCRIPTION = "This endpoint allows users to remove item to their shopping cart, updating the quantity if the item already exists.";
+    public static final String CART_ITEM_REMOVE = "The item has been successfully remove to the shopping cart";
 
 }

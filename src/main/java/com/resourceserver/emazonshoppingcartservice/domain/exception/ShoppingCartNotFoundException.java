@@ -1,4 +1,4 @@
-package com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.exceptions;
+package com.resourceserver.emazonshoppingcartservice.domain.exception;
 
 import com.resourceserver.emazonshoppingcartservice.domain.constants.ErrorMessagesConstants;
 

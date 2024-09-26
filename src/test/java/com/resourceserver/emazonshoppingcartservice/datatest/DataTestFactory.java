@@ -1,8 +1,11 @@
 package com.resourceserver.emazonshoppingcartservice.datatest;
 
 import com.resourceserver.emazonshoppingcartservice.domain.model.CartItem;
+import com.resourceserver.emazonshoppingcartservice.domain.model.ShoppingCart;
 import com.resourceserver.emazonshoppingcartservice.domain.model.StockVerificationRequest;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DataTestFactory {
@@ -18,4 +21,20 @@ public class DataTestFactory {
         request.setArticleId(1L);
         return request;
     }
+
+    public static ShoppingCart createValidShoppingCart(Long userId){
+        CartItem item1 = new CartItem(1L, 1L, 10 );
+        CartItem item2 = new CartItem(2L,  2L, 10);
+
+        List<CartItem> items = new ArrayList<>();
+        items.add(item1);
+        items.add(item2);
+
+        return new ShoppingCart(userId,
+                items,
+                LocalDateTime.now(),
+                LocalDateTime.now().minusHours(10));
+    }
+
+
 }

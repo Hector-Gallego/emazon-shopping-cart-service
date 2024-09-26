@@ -14,4 +14,5 @@ public class ErrorMessagesConstants {
     public static final String ARTICLE_ID_POSITIVE = "Article ID must be positive";
     public static final String QUANTITY_NOT_NULL = "Quantity cannot be null";
     public static final String QUANTITY_MIN_VALUE = "Quantity must be at least 1";
+    public static final String ARTICLE_NOT_FOUND = "Article whit id: %d not found";
 }

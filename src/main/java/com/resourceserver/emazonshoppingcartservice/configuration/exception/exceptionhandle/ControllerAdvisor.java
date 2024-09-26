@@ -4,6 +4,7 @@ package com.resourceserver.emazonshoppingcartservice.configuration.exception.exc
 import com.resourceserver.emazonshoppingcartservice.configuration.exception.constants.ExceptionsConstants;
 import com.resourceserver.emazonshoppingcartservice.configuration.feign.CustomFeignException;
 import com.resourceserver.emazonshoppingcartservice.domain.constants.ErrorMessagesConstants;
+import com.resourceserver.emazonshoppingcartservice.domain.exception.ArticleNotFoundException;
 import com.resourceserver.emazonshoppingcartservice.domain.exception.CategoryLimitExceededException;
 import com.resourceserver.emazonshoppingcartservice.domain.exception.InsufficientStockException;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +65,11 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CustomFeignException.class)
     public ResponseEntity<CustomErrorResponse> handleCustomFeignException(CustomFeignException exception) {
         return buildErrorResponse(exception.getMessage(), exception.getStatus(), Collections.emptyList());
+    }
+
+    @ExceptionHandler(ArticleNotFoundException.class)
+    public ResponseEntity<CustomErrorResponse> handleArticleNotFoundException(ArticleNotFoundException exception) {
+        return buildErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST.value(), Collections.emptyList());
     }
 
     @ExceptionHandler(RuntimeException.class)

@@ -1,28 +1,30 @@
 package com.resourceserver.emazonshoppingcartservice.domain.usecase;
 
+import com.resourceserver.emazonshoppingcartservice.domain.exception.ArticleNotFoundException;
 import com.resourceserver.emazonshoppingcartservice.domain.model.CartItem;
 import com.resourceserver.emazonshoppingcartservice.domain.model.ShoppingCart;
 import com.resourceserver.emazonshoppingcartservice.domain.model.StockVerificationRequest;
-import com.resourceserver.emazonshoppingcartservice.domain.ports.api.AddItemToCartServicePort;
+import com.resourceserver.emazonshoppingcartservice.domain.ports.api.ShoppingCartServicePort;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.sec.AuthenticatedManagerPort;
-import com.resourceserver.emazonshoppingcartservice.domain.ports.spi.AddItemToCartPersistencePort;
+import com.resourceserver.emazonshoppingcartservice.domain.ports.spi.ShoppingCartPersistencePort;
 import com.resourceserver.emazonshoppingcartservice.domain.validators.StockValidator;
+import com.resourceserver.emazonshoppingcartservice.domain.exception.ShoppingCartNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShoppingCartUseCase implements AddItemToCartServicePort {
+public class ShoppingCartUseCase implements ShoppingCartServicePort {
 
-    private final AddItemToCartPersistencePort addItemToCartPersistencePort;
+    private final ShoppingCartPersistencePort shoppingCartPersistencePort;
     private final AuthenticatedManagerPort authenticatedManagerPort;
     private final StockValidator stockValidator;
 
-    public ShoppingCartUseCase(AddItemToCartPersistencePort addItemToCartPersistencePort,
+    public ShoppingCartUseCase(ShoppingCartPersistencePort shoppingCartPersistencePort,
                                AuthenticatedManagerPort authenticatedManagerPort,
                                StockValidator stockValidator) {
 
-        this.addItemToCartPersistencePort = addItemToCartPersistencePort;
+        this.shoppingCartPersistencePort = shoppingCartPersistencePort;
         this.authenticatedManagerPort = authenticatedManagerPort;
         this.stockValidator = stockValidator;
     }
@@ -38,12 +40,33 @@ public class ShoppingCartUseCase implements AddItemToCartServicePort {
         stockValidator.validateStockAvailability(stockVerificationRequest);
 
 
-        if (addItemToCartPersistencePort.doesCartExist(userId)) {
-            addItemToCartPersistencePort.addItemToCart(cartItem, userId);
+        if (shoppingCartPersistencePort.doesCartExist(userId)) {
+            shoppingCartPersistencePort.addItemToCart(cartItem, userId);
         } else {
             ShoppingCart shoppingCart = createNewShoppingCart(cartItem, userId);
-            addItemToCartPersistencePort.saveShoppingCart(shoppingCart, userId);
+            shoppingCartPersistencePort.saveShoppingCart(shoppingCart);
         }
+
+    }
+
+    @Override
+    public void removeItemFromShoppingCart(Long articleId) {
+
+        Long userId = authenticatedManagerPort.getUserId();
+
+        ShoppingCart shoppingCart = shoppingCartPersistencePort.getShoppingCartByUserId(userId).orElseThrow(
+                () -> new ShoppingCartNotFoundException(userId)
+        );
+
+        boolean removed = shoppingCart.getItems().removeIf(item -> item.getArticleId().equals(articleId));
+
+        if (!removed) {
+            throw new ArticleNotFoundException(articleId);
+        }
+
+        shoppingCart.setLastUpdated(LocalDateTime.now());
+
+        shoppingCartPersistencePort.saveShoppingCart(shoppingCart);
 
     }
 
@@ -58,7 +81,7 @@ public class ShoppingCartUseCase implements AddItemToCartServicePort {
         return new StockVerificationRequest(
                 cartItem.getArticleId(),
                 cartItem.getQuantity(),
-                addItemToCartPersistencePort.getArticlesIdForCart(userId)
+                shoppingCartPersistencePort.getArticlesIdForCart(userId)
         );
 
     }

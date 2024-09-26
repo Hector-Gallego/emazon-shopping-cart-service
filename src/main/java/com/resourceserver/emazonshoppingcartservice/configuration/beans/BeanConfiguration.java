@@ -1,10 +1,10 @@
 package com.resourceserver.emazonshoppingcartservice.configuration.beans;
 
 import com.resourceserver.emazonshoppingcartservice.configuration.security.services.AuthenticatedUserManager;
-import com.resourceserver.emazonshoppingcartservice.domain.ports.api.AddItemToCartServicePort;
+import com.resourceserver.emazonshoppingcartservice.domain.ports.api.ShoppingCartServicePort;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.feign.StockFeignServicePort;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.sec.AuthenticatedManagerPort;
-import com.resourceserver.emazonshoppingcartservice.domain.ports.spi.AddItemToCartPersistencePort;
+import com.resourceserver.emazonshoppingcartservice.domain.ports.spi.ShoppingCartPersistencePort;
 import com.resourceserver.emazonshoppingcartservice.domain.usecase.ShoppingCartUseCase;
 import com.resourceserver.emazonshoppingcartservice.domain.validators.StockValidator;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.feign.adapter.StockFeignClientAdapter;
@@ -20,19 +20,19 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfiguration {
 
     @Bean
-    AddItemToCartServicePort addItemToCartServicePort(
-            AddItemToCartPersistencePort addItemToCartPersistencePort,
+    ShoppingCartServicePort addItemToCartServicePort(
+            ShoppingCartPersistencePort shoppingCartPersistencePort,
             AuthenticatedManagerPort authenticatedManagerPort,
             StockValidator stockValidator) {
 
         return new ShoppingCartUseCase(
-                addItemToCartPersistencePort,
+                shoppingCartPersistencePort,
                 authenticatedManagerPort,
                 stockValidator);
     }
 
     @Bean
-    AddItemToCartPersistencePort addItemToCartPersistencePort(
+    ShoppingCartPersistencePort addItemToCartPersistencePort(
             ShoppingCartRepository shoppingCartRepository,
             ShoppingCartEntityMapper shoppingCartEntityMapper,
             CartItemEntityMapper cartItemEntityMapper) {

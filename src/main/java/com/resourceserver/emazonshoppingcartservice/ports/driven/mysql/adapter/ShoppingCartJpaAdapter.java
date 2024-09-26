@@ -1,9 +1,9 @@
 package com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.adapter;
 
-import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.exceptions.ShoppingCartNotFoundException;
+import com.resourceserver.emazonshoppingcartservice.domain.exception.ShoppingCartNotFoundException;
 import com.resourceserver.emazonshoppingcartservice.domain.model.CartItem;
 import com.resourceserver.emazonshoppingcartservice.domain.model.ShoppingCart;
-import com.resourceserver.emazonshoppingcartservice.domain.ports.spi.AddItemToCartPersistencePort;
+import com.resourceserver.emazonshoppingcartservice.domain.ports.spi.ShoppingCartPersistencePort;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.entity.CartItemEntity;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.entity.ShoppingCartEntity;
 import com.resourceserver.emazonshoppingcartservice.ports.driven.mysql.mapper.CartItemEntityMapper;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public class ShoppingCartJpaAdapter implements AddItemToCartPersistencePort {
+public class ShoppingCartJpaAdapter implements ShoppingCartPersistencePort {
 
     private final ShoppingCartRepository shoppingCartRepository;
     private final ShoppingCartEntityMapper shoppingCartEntityMapper;
@@ -53,7 +53,7 @@ public class ShoppingCartJpaAdapter implements AddItemToCartPersistencePort {
     }
 
     @Override
-    public void saveShoppingCart(ShoppingCart shoppingCart, Long userId) {
+    public void saveShoppingCart(ShoppingCart shoppingCart) {
         shoppingCartRepository.save(shoppingCartEntityMapper.toEntity(shoppingCart));
     }
 
@@ -73,4 +73,11 @@ public class ShoppingCartJpaAdapter implements AddItemToCartPersistencePort {
                 .map(CartItemEntity::getArticleId)
                 .toList();
     }
+
+    @Override
+    public Optional<ShoppingCart> getShoppingCartByUserId(Long userId) {
+        return shoppingCartRepository.findByUserId(userId)
+                .map(shoppingCartEntityMapper::toDomain);
+    }
+
 }
