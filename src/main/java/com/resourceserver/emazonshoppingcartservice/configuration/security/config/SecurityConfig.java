@@ -37,7 +37,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/cart").hasAuthority(RoleNameConstants.CLIENT)
+                        .requestMatchers("/api/cart", "/api/cart/getArticlesCart").hasAuthority(RoleNameConstants.CLIENT)
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess

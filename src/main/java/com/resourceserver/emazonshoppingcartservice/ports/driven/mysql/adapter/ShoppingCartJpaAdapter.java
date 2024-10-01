@@ -80,4 +80,13 @@ public class ShoppingCartJpaAdapter implements ShoppingCartPersistencePort {
                 .map(shoppingCartEntityMapper::toDomain);
     }
 
+    @Override
+    public List<CartItem> getArticleItemsForCart(Long userId) {
+        ShoppingCartEntity shoppingCart = shoppingCartRepository.findByUserId(userId)
+                .orElseThrow();
+
+        return shoppingCart.getItems().stream().map(cartItemMapper::toDomain).toList();
+
+    }
+
 }

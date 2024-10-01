@@ -12,4 +12,5 @@ public interface ShoppingCartPersistencePort {
     boolean doesCartExist(Long userId);
     List<Long> getArticlesIdForCart(Long userId);
     Optional<ShoppingCart> getShoppingCartByUserId(Long userId);
+    List<CartItem> getArticleItemsForCart(Long userId);
 }

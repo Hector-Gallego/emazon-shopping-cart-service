@@ -3,6 +3,7 @@ package com.resourceserver.emazonshoppingcartservice.ports.driving.controller;
 import com.resourceserver.emazonshoppingcartservice.configuration.exception.exceptionhandle.CustomErrorResponse;
 import com.resourceserver.emazonshoppingcartservice.configuration.openapi.constants.OpenApiConstants;
 import com.resourceserver.emazonshoppingcartservice.domain.constants.SuccessMessagesConstants;
+import com.resourceserver.emazonshoppingcartservice.domain.model.CartItem;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.api.ShoppingCartServicePort;
 import com.resourceserver.emazonshoppingcartservice.ports.driving.dto.request.CartItemDto;
 import com.resourceserver.emazonshoppingcartservice.ports.driving.dto.response.CustomApiResponse;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -26,6 +28,7 @@ public class ShoppingCartController {
 
     private final ShoppingCartServicePort shoppingCartServicePort;
     private final CartItemMapper cartItemMapper;
+
     public ShoppingCartController(ShoppingCartServicePort shoppingCartServicePort, CartItemMapper cartItemMapper) {
         this.shoppingCartServicePort = shoppingCartServicePort;
         this.cartItemMapper = cartItemMapper;
@@ -50,7 +53,7 @@ public class ShoppingCartController {
                             schema = @Schema(implementation = CustomErrorResponse.class)))
     })
     @PostMapping
-    ResponseEntity<CustomApiResponse> addItem(@Valid @RequestBody CartItemDto cartItemDto){
+    ResponseEntity<CustomApiResponse> addItem(@Valid @RequestBody CartItemDto cartItemDto) {
 
         shoppingCartServicePort.addItemToCartShopping(cartItemMapper.toDomain(cartItemDto));
         CustomApiResponse response = new CustomApiResponse(
@@ -80,7 +83,7 @@ public class ShoppingCartController {
                             schema = @Schema(implementation = CustomErrorResponse.class)))
     })
     @DeleteMapping("/{articleId}")
-    ResponseEntity<CustomApiResponse> deleteItem(@PathVariable Long articleId){
+    ResponseEntity<CustomApiResponse> deleteItem(@PathVariable Long articleId) {
 
         shoppingCartServicePort.removeItemFromShoppingCart(articleId);
 
@@ -91,5 +94,29 @@ public class ShoppingCartController {
         );
         return ResponseEntity.ok().body(response);
 
+    }
+
+
+    @GetMapping("/getArticlesCart")
+    ResponseEntity<List<CartItemDto>> getArticlesCart() {
+
+        List<CartItemDto> cartItemDtos = shoppingCartServicePort.listCartItems()
+                .stream()
+                .map(cartItemMapper::toDto)
+                .toList();
+
+        return ResponseEntity.ok().body(cartItemDtos);
+    }
+
+    @DeleteMapping("/clearCart")
+    ResponseEntity<Void> clearCart(){
+        shoppingCartServicePort.clearCartItems();
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/addItemsCart")
+    ResponseEntity<Void> addItemsCart(@RequestBody List<CartItem> cartItems){
+        shoppingCartServicePort.addCartItems(cartItems);
+        return ResponseEntity.ok().build();
     }
 }

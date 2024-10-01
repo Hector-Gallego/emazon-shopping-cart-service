@@ -70,6 +70,37 @@ public class ShoppingCartUseCase implements ShoppingCartServicePort {
 
     }
 
+    @Override
+    public List<CartItem> listCartItems() {
+
+        Long userId = authenticatedManagerPort.getUserId();
+        return shoppingCartPersistencePort.getArticleItemsForCart(userId);
+    }
+
+    @Override
+    public void clearCartItems() {
+        Long userId = authenticatedManagerPort.getUserId();
+
+        ShoppingCart shoppingCart = shoppingCartPersistencePort.getShoppingCartByUserId(userId).orElseThrow(
+                () -> new ShoppingCartNotFoundException(userId)
+        );
+        shoppingCart.getItems().clear();
+        shoppingCartPersistencePort.saveShoppingCart(shoppingCart);
+    }
+
+    @Override
+    public void addCartItems(List<CartItem> cartItems) {
+
+        Long userId = authenticatedManagerPort.getUserId();
+
+        ShoppingCart shoppingCart = shoppingCartPersistencePort.getShoppingCartByUserId(userId).orElseThrow(
+                () -> new ShoppingCartNotFoundException(userId)
+        );
+        shoppingCart.getItems().addAll(cartItems);
+        shoppingCartPersistencePort.saveShoppingCart(shoppingCart);
+
+    }
+
 
     private ShoppingCart createNewShoppingCart(CartItem cartItem, Long userId) {
         List<CartItem> items = new ArrayList<>();
