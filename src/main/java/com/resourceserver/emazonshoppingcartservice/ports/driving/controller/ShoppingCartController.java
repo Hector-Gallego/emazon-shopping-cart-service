@@ -3,7 +3,7 @@ package com.resourceserver.emazonshoppingcartservice.ports.driving.controller;
 import com.resourceserver.emazonshoppingcartservice.configuration.exception.exceptionhandle.CustomErrorResponse;
 import com.resourceserver.emazonshoppingcartservice.configuration.openapi.constants.OpenApiConstants;
 import com.resourceserver.emazonshoppingcartservice.domain.constants.SuccessMessagesConstants;
-import com.resourceserver.emazonshoppingcartservice.domain.model.CartItem;
+import com.resourceserver.emazonshoppingcartservice.domain.model.*;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.api.ShoppingCartServicePort;
 import com.resourceserver.emazonshoppingcartservice.ports.driving.dto.request.CartItemDto;
 import com.resourceserver.emazonshoppingcartservice.ports.driving.dto.response.CustomApiResponse;
@@ -97,16 +97,26 @@ public class ShoppingCartController {
     }
 
 
-    @GetMapping("/getArticlesCart")
-    ResponseEntity<List<CartItemDto>> getArticlesCart() {
-
-        List<CartItemDto> cartItemDtos = shoppingCartServicePort.listCartItems()
-                .stream()
-                .map(cartItemMapper::toDto)
-                .toList();
-
-        return ResponseEntity.ok().body(cartItemDtos);
+    @PostMapping("/listArticlesCart")
+    ResponseEntity<PageArticlesCartResponse<ArticleCart>> getArticlesCart(@RequestBody PageArticlesCartRequest pageArticlesCartRequest) {
+        PageArticlesCartResponse<ArticleCart> pageArticlesCart = shoppingCartServicePort.listPageArticlesCart(pageArticlesCartRequest);
+        return ResponseEntity.ok().body(pageArticlesCart);
     }
+
+
+    @PostMapping("/updateStockGetSaleData")
+    ResponseEntity<SaleData> updateStockGetSaleData() {
+        SaleData saleData = shoppingCartServicePort.updateStockGetSaleData();
+        return ResponseEntity.ok().body(saleData);
+    }
+
+
+    @GetMapping("/getAllItemsShoppingCart")
+    ResponseEntity<List<CartItem>> getAllItemsShoppingCart() {
+        List<CartItem> cartItems = shoppingCartServicePort.listCartItems();
+        return ResponseEntity.ok().body(cartItems);
+    }
+
 
     @DeleteMapping("/clearCart")
     ResponseEntity<Void> clearCart(){

@@ -23,12 +23,14 @@ public class BeanConfiguration {
     ShoppingCartServicePort addItemToCartServicePort(
             ShoppingCartPersistencePort shoppingCartPersistencePort,
             AuthenticatedManagerPort authenticatedManagerPort,
-            StockValidator stockValidator) {
+            StockValidator stockValidator,
+            StockFeignServicePort stockFeignServicePort) {
 
         return new ShoppingCartUseCase(
                 shoppingCartPersistencePort,
                 authenticatedManagerPort,
-                stockValidator);
+                stockValidator,
+                stockFeignServicePort);
     }
 
     @Bean

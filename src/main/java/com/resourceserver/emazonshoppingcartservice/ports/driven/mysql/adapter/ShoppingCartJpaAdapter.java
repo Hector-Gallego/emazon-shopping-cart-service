@@ -89,4 +89,15 @@ public class ShoppingCartJpaAdapter implements ShoppingCartPersistencePort {
 
     }
 
+    @Override
+    public Integer getArticleQuantityInCart(Long userId, Long articleId) {
+        return shoppingCartRepository.findByUserId(userId)
+                .flatMap(cart -> cart.getItems().stream()
+                        .filter(item -> item.getArticleId().equals(articleId))
+                        .map(CartItemEntity::getQuantity)
+                        .findFirst()
+                )
+                .orElse(0);
+    }
+
 }

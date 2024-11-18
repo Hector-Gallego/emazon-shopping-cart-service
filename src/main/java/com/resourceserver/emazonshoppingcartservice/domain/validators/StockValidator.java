@@ -7,6 +7,8 @@ import com.resourceserver.emazonshoppingcartservice.domain.model.StockVerificati
 import com.resourceserver.emazonshoppingcartservice.domain.model.StockVerificationResponse;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.feign.StockFeignServicePort;
 
+import java.util.List;
+
 public class StockValidator {
 
     private final StockFeignServicePort stockFeignServicePort;
@@ -16,6 +18,8 @@ public class StockValidator {
     }
 
     public void validateStockAvailability(StockVerificationRequest request) {
+
+
 
         StockVerificationResponse response = stockFeignServicePort.getAvailableStock(request);
 

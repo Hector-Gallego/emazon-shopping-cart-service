@@ -1,6 +1,7 @@
 package com.resourceserver.emazonshoppingcartservice.domain.ports.spi;
 
 import com.resourceserver.emazonshoppingcartservice.domain.model.CartItem;
+import com.resourceserver.emazonshoppingcartservice.domain.model.SaleData;
 import com.resourceserver.emazonshoppingcartservice.domain.model.ShoppingCart;
 
 import java.util.List;
@@ -13,4 +14,6 @@ public interface ShoppingCartPersistencePort {
     List<Long> getArticlesIdForCart(Long userId);
     Optional<ShoppingCart> getShoppingCartByUserId(Long userId);
     List<CartItem> getArticleItemsForCart(Long userId);
+    Integer getArticleQuantityInCart(Long userId, Long articleId);
+
 }

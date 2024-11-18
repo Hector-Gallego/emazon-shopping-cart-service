@@ -1,10 +1,9 @@
 package com.resourceserver.emazonshoppingcartservice.domain.usecase;
 
 import com.resourceserver.emazonshoppingcartservice.domain.exception.ArticleNotFoundException;
-import com.resourceserver.emazonshoppingcartservice.domain.model.CartItem;
-import com.resourceserver.emazonshoppingcartservice.domain.model.ShoppingCart;
-import com.resourceserver.emazonshoppingcartservice.domain.model.StockVerificationRequest;
+import com.resourceserver.emazonshoppingcartservice.domain.model.*;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.api.ShoppingCartServicePort;
+import com.resourceserver.emazonshoppingcartservice.domain.ports.feign.StockFeignServicePort;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.sec.AuthenticatedManagerPort;
 import com.resourceserver.emazonshoppingcartservice.domain.ports.spi.ShoppingCartPersistencePort;
 import com.resourceserver.emazonshoppingcartservice.domain.validators.StockValidator;
@@ -19,14 +18,16 @@ public class ShoppingCartUseCase implements ShoppingCartServicePort {
     private final ShoppingCartPersistencePort shoppingCartPersistencePort;
     private final AuthenticatedManagerPort authenticatedManagerPort;
     private final StockValidator stockValidator;
+    private final StockFeignServicePort stockFeignServicePort;
 
     public ShoppingCartUseCase(ShoppingCartPersistencePort shoppingCartPersistencePort,
                                AuthenticatedManagerPort authenticatedManagerPort,
-                               StockValidator stockValidator) {
+                               StockValidator stockValidator, StockFeignServicePort stockFeignServicePort) {
 
         this.shoppingCartPersistencePort = shoppingCartPersistencePort;
         this.authenticatedManagerPort = authenticatedManagerPort;
         this.stockValidator = stockValidator;
+        this.stockFeignServicePort = stockFeignServicePort;
     }
 
     @Override
@@ -34,18 +35,15 @@ public class ShoppingCartUseCase implements ShoppingCartServicePort {
 
 
         Long userId = authenticatedManagerPort.getUserId();
-
-        StockVerificationRequest stockVerificationRequest = createStockVerificationRequest(userId, cartItem);
-
-        stockValidator.validateStockAvailability(stockVerificationRequest);
-
-
-        if (shoppingCartPersistencePort.doesCartExist(userId)) {
-            shoppingCartPersistencePort.addItemToCart(cartItem, userId);
-        } else {
-            ShoppingCart shoppingCart = createNewShoppingCart(cartItem, userId);
+        if (!shoppingCartPersistencePort.doesCartExist(userId)) {
+            ShoppingCart shoppingCart = createNewShoppingCart(userId);
             shoppingCartPersistencePort.saveShoppingCart(shoppingCart);
         }
+
+        StockVerificationRequest stockVerificationRequest = createStockVerificationRequest(userId, cartItem);
+        stockValidator.validateStockAvailability(stockVerificationRequest);
+        shoppingCartPersistencePort.addItemToCart(cartItem, userId);
+
 
     }
 
@@ -72,9 +70,16 @@ public class ShoppingCartUseCase implements ShoppingCartServicePort {
 
     @Override
     public List<CartItem> listCartItems() {
-
         Long userId = authenticatedManagerPort.getUserId();
         return shoppingCartPersistencePort.getArticleItemsForCart(userId);
+    }
+
+    @Override
+    public PageArticlesCartResponse<ArticleCart> listPageArticlesCart(PageArticlesCartRequest pageArticlesCartRequest) {
+
+        List<CartItem> cartItems = listCartItems();
+        pageArticlesCartRequest.setArticlesCart(cartItems);
+        return stockFeignServicePort.listArticlesCart(pageArticlesCartRequest);
     }
 
     @Override
@@ -101,17 +106,29 @@ public class ShoppingCartUseCase implements ShoppingCartServicePort {
 
     }
 
+    @Override
+    public SaleData updateStockGetSaleData() {
+        Long userId = authenticatedManagerPort.getUserId();
+        List<CartItem> cartItems = shoppingCartPersistencePort.getArticleItemsForCart(userId);
+        clearCartItems();
+        return stockFeignServicePort.updateStockAndGetSaleData(cartItems);
+    }
 
-    private ShoppingCart createNewShoppingCart(CartItem cartItem, Long userId) {
+
+    private ShoppingCart createNewShoppingCart(Long userId) {
         List<CartItem> items = new ArrayList<>();
-        items.add(cartItem);
         return new ShoppingCart(userId, items, LocalDateTime.now(), LocalDateTime.now());
     }
 
     private StockVerificationRequest createStockVerificationRequest(Long userId, CartItem cartItem) {
+
+        Integer currentQuantityInCart = shoppingCartPersistencePort
+                .getArticleQuantityInCart(userId, cartItem.getArticleId());
+
+        Integer totalQuantity = currentQuantityInCart + cartItem.getQuantity();
         return new StockVerificationRequest(
                 cartItem.getArticleId(),
-                cartItem.getQuantity(),
+                totalQuantity,
                 shoppingCartPersistencePort.getArticlesIdForCart(userId)
         );
 
